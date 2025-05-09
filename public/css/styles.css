@@ -229,12 +229,28 @@ footer {
     max-width: 90%;
   }
 
+  .reviews {
+    margin: 2rem auto;
+  }
+
   .upgrades h2, .reviews h2 {
     text-align: center;
   }
 
-  .upgrade-grid {
-    grid-template-columns: 1fr;
-    justify-items: center;
+  .upgrade-title {
+    padding: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
+
+  .delorean-content {
+    flex-direction: column-reverse;
+    gap: 2rem;
+  }
+
 }
