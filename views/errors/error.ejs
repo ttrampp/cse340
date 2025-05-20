@@ -1,0 +1,9 @@
+<% if (title) { %>
+    <h1><%= title %></h1>
+<% } else {
+    res.redirect('/')
+} %>
+
+<%- message %>
+
+<p style="margin-top: 2rem;">But hey, it's not the end of the world. Try the <a href="/">Home page</a>?</p>

@@ -1,0 +1,12 @@
+/***** CONTENT HEADING *****/
+<% if (title) { %>
+<h1><%= title %></h1>
+<% } else {
+  res.redirect('/')
+} %>
+
+/***** MESSAGE *****/
+<%# messages() %>
+
+/***** INVENTORY ITEMS DISPLAY *****/
+<%- grid %>
