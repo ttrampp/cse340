@@ -58,6 +58,32 @@ Util.buildClassificationGrid = async function(data){
   return grid
 }
 
+/* ***************************
+ *  Build the vehicle detail view HTML
+ * ************************** */
+Util.buildDetailView = function (data) {
+  let detailView = `
+    <div class="detail-wrapper">
+      <div class="detail-image">
+        <img src="${data.inv_image.replace('/image/', '/images/')}" alt="Image of ${data.inv_make} ${data.inv_model}">
+
+      </div>
+      <div class="detail-info">
+        <h2>${data.inv_year} ${data.inv_make} ${data.inv_model}</h2>
+
+        <div class="detail-row"><span class="label">Price:</span> $${Number(data.inv_price).toLocaleString()}</div>
+        <div class="detail-row"><span class="label">Category:</span> ${data.classification_name}</div>
+        <div class="detail-row description-row"><span class="label">Description:</span><span class="value">${data.inv_description}</span></div>
+        <div class="detail-row"><span class="label">Color:</span> ${data.inv_color}</div>
+        <div class="detail-row"><span class="label">Mileage:</span> ${parseInt(data.inv_miles).toLocaleString()} miles</div>
+      </div>
+    </div>
+  `;
+  console.log("Rendered HTML:\n", detailView);
+
+  return detailView;
+}
+
 /* ****************************************
  * Middleware For Handling Errors
  * Wrap other function in this for 

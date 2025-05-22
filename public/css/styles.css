@@ -196,6 +196,78 @@ section.upgrades {
   border-radius: 4px;
 }
 
+.detail-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  align-items: flex-start;
+}
+
+.detail-image {
+  flex: 1 1 300px;
+  min-width: 500px;
+}
+
+.detail-image img {
+  max-width: 100%;;
+  height: auto;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 0 8px regba(0, 0, 0, 0.1);
+}
+
+.detail-info {
+  flex: 1 1 300px;
+}
+
+.detail-info h2 {
+  font-size: 2rem;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+.detail-info p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.detail-info strong {
+  display: inline-block;
+  width: 110px;
+  color: #000;
+}
+
+.detail-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.detail-row .label {
+  font-weight: bold;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.detail-row .value {
+  flex-grow: 1;
+}
+
+.description-row .value {
+  white-space: pre-wrap;
+}
+
+.hanging-indent {
+  margin: 0;
+  text-indent: -120px;
+  padding-left: 120px;
+}
+
 footer {
   text-align: left;
   font-size: 0.9rem;
@@ -251,6 +323,19 @@ footer {
   .delorean-content {
     flex-direction: column-reverse;
     gap: 2rem;
+  }
+
+  .detail-wrapper {
+    flex-direction: column;
+  }
+
+  .detail-image,
+  .detail-info {
+    flex: 1 1 100%;
+  }
+
+  .detail-info h2 {
+    font-size: 1.6rem;
   }
 
 }
