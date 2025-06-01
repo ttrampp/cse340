@@ -295,6 +295,16 @@ section.upgrades {
   margin-bottom: 1rem;
 }
 
+ul.notice {
+  list-style: none;
+  padding: 1rem;
+  background-color: white;
+  border: 1px solid #00AEEF;
+  color: #003b5c;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
 
 footer {
   text-align: left;

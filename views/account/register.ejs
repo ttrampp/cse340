@@ -1,0 +1,19 @@
+<h1><%= title%></h1>
+<% messages() %>
+
+<form action="/account/register" method="post" class="form">
+    <label for="accountFirstname">First Name:</label>
+    <input type="text" name="accountFirstname" id="accountFirstname" required>
+
+    <label for="accountLastname">Last Name:</label>
+    <input type="text" name="accountLastname" id="accountLastname" required>
+
+    <label for="accountEmail">Email:</label>
+    <input type="email" name="accountEmail" id="accountEmail" required>
+
+    <label for="accountPassword">Password:</label>
+    <small>Password must be at least 12 characters, with 1 uppercase, 1 number, and 1 special character.</small>
+    <input type="password" name="accountPassword" id="accountPassword" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">
+
+    <button type="submit">Register</button>
+</form>
