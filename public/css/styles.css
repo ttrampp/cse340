@@ -305,6 +305,45 @@ ul.notice {
   margin-bottom: 1rem;
 }
 
+/*INVALID AND VALID INPUTS*/
+input:required:invalid,
+input:focus:invalid {
+  border: 2px solid red;
+  background-color: lightblue;
+}
+
+input:required:valid {
+  border: 2px solid green;
+  background-color: #a7dda7;
+}
+
+button.registerButton {
+  background-color: orange;
+  color:#000;
+  border: none;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2ease;
+  box-shadow: 0 2px 4px black;
+}
+
+button.registerButton:hover {
+  background-color: #0056b3;
+  transform: scale(1.03);
+}
+
+button.registerButton:focus {
+  outline: 3px solid yellow;
+  outline-offset: 2px;
+}
+
+button.registerButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 
 footer {
   text-align: left;
