@@ -1,9 +1,18 @@
 <h1><%= title %></h1>
 <%- messages() %>
 
-<form action="/account/login" method="post" class="form">
+<% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+
+<form id="loginForm" action="/account/login" method="post" class="form">
     <label for="account_email">Email:</label>
-    <input type="email" name="account_email" id="account_email" required>
+    <input type="email" name="account_email" id="account_email" required value="<%= locals.account_email %>">
 
     <label for="account_password">Password:</label>
     <input type="password" name="account_password" id="account_password" required>
