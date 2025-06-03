@@ -1,0 +1,37 @@
+<% include ('../partials/header.ejs') %>
+
+<main>
+    <h1>Add New Classification</h1>
+
+    <% if (message) { %>
+        <div class="notice"><%= message %></div>
+    <% } %>
+    
+    <% if (errors && errors.length > 0) { %>
+        <div class="error-box">
+            <ul>
+                <% errors.forEach(function(error) { %>
+                    <li><%= error.msg %></li>                
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
+    
+    <form id="addClassificationForm" action="/inv/add-classification" method="post">
+        <label for="classification_name">Classification Name</label>
+        <input
+            type="text"
+            id="classification_name"
+            name="classification_name"
+            pattern="^[a-zA-Z0-9]+$"
+            title="Letters and numbers only. No spaces or special characters."
+            required
+        />
+        <p class="form-instructions">
+            Classification names must contain only letters and numbers (no spaces or special characters).
+        </p>
+        <button type="submit">Add Classification</button>
+    </form>
+</main>
+
+<% include ('../partials/footer.ejs') %>

@@ -1,5 +1,6 @@
 const invModel = require("../models/inventory-model")
 const Util = {}
+const {body, validationResult} = require("express-validator")
 
 /* ************************
  * Constructs the nav HTML unordered list
@@ -82,6 +83,112 @@ Util.buildDetailView = function (data) {
   console.log("Rendered HTML:\n", detailView);
 
   return detailView;
+}
+
+/* *******************************
+ * Classification Validation Rules
+ * *******************************/
+Util.classificationRules = () => {
+  return [
+    body("classification_name")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Classification name is required.")
+      .matches(/^[a-zA-Z0-9]+$/)
+      .withMessage("Classification name must be letters and numbers only (no spaces or special characters).")
+  ]
+}
+
+/* *******************************
+ * Check classification data and return errors
+ * *******************************/
+Util.checkClassificationData = async (req, res, next) => {
+  const {classification_name} = req.body
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    const nav = await Util.getNav()
+    res.render("inventory/add-classification", {
+      title: "Add Classification",
+      nav,
+      errors: errors.array(),
+      message: null,
+      classification_name
+    })
+    return
+  }
+  next()
+}
+
+/* *******************************
+ * Check classification data and return errors
+ * *******************************/
+Util.inventoryRules = () => {
+  return [
+    body("classification_id")
+      .isInt({min: 1})
+      .withMessage("Please choose a valid classification. Thank you."),
+     body("inv_make")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Make is required."),
+    body("inv_model")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Model is required."),
+    body("inv_year")
+      .isInt({ min: 1900, max: 2099 })
+      .withMessage("Enter a valid 4-digit year."),
+    body("inv_description")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Description is required."),
+    body("inv_image")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Image path is required."),
+    body("inv_thumbnail")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Thumbnail path is required."),
+    body("inv_price")
+      .isFloat({ min: 0 })
+      .withMessage("Price must be a positive number."),
+    body("inv_miles")
+      .isInt({ min: 0 })
+      .withMessage("Miles must be a positive integer."),
+    body("inv_color")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Color is required.")
+  ]
+}
+
+/*handle errors and return sticky data*/
+
+Util.checkInventoryData = async (req, res, next) => {
+  const {
+    classification_id, inv_make, inv_model, inv_year, inv_miles,
+    inv_description, inv_color, inv_image, inv_thumbnail, inv_price
+  } = req.body
+
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    const nav = await Util.getNav()
+    const classificationList = await Util.buildClassificationList(classification_id)
+
+    res.render("inventory/add-inventory", {
+      title: "Add Inventory",
+      nav,
+      classificationList,
+      errors: errors.array(),
+      message: null,
+      classification_id, inv_make, inv_model, inv_year,
+      inv_description, inv_image, inv_thumbnail, inv_price,
+      inv_miles, inv_color
+    })
+    return
+  }
+  next()
 }
 
 /* ****************************************

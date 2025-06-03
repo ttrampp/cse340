@@ -12,4 +12,24 @@ router.get("/detail/:invId", utilities.handleErrors(invController.buildByInvento
 
 router.get("/trigger-error", utilities.handleErrors(invController.triggerError));
 
+router.get("/", invController.buildManagement);
+
+router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification));
+
+router.get("/add-inventory", utilities.handleErrors(invController.buildAddInventory));
+
+router.post(
+    "/add-classification",
+    utilities.classificationRules(),
+    utilities.checkClassificationData,
+    utilities.handleErrors(invController.addClassification)
+)
+
+router.post(
+    "/add-inventory",
+    utilities.inventoryRules(),
+    utilities.checkInventoryData,
+    utilities.handleErrors(invController.buildAddInventory)
+)
+
 module.exports = router;
