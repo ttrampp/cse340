@@ -70,13 +70,11 @@ invController.triggerError = async function (req, res, next) {
 invController.buildManagement = async function (req, res, next) {
   try {
     let nav = await utilities.getNav();
-    const inventory = await invModel.getAllInventory();
-    const inventoryTable = await utilities.buildInventoryTable(inventory);
+
     res.render("inventory/management", {
       title: "Inventory Management",
       nav,
       message: req.flash("notice"),
-      inventoryTable
     })
   } catch (error) {
     next(error)
