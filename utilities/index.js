@@ -1,11 +1,11 @@
 const invModel = require("../models/inventory-model")
-const Util = {}
+
 const {body, validationResult} = require("express-validator")
 
 /* ************************
  * Constructs the nav HTML unordered list
  ************************** */
-Util.getNav = async function (req, res, next) {
+async function getNav(req, res, next) {
   let data = await invModel.getClassifications()
   //console.log(data)
   let list = "<ul>"
@@ -29,7 +29,7 @@ Util.getNav = async function (req, res, next) {
 /* **************************************
 * Build the classification view HTML
 * ************************************ */
-Util.buildClassificationGrid = async function(data){
+async function buildClassificationOptions(data) {
   let grid
   if(data.length > 0){
     grid = '<ul id="inv-display">'
@@ -62,7 +62,7 @@ Util.buildClassificationGrid = async function(data){
 /* ***************************
  *  Build the vehicle detail view HTML
  * ************************** */
-Util.buildDetailView = function (data) {
+function buildDetailView(data) {
   let detailView = `
     <div class="detail-wrapper">
       <div class="detail-image">
@@ -88,7 +88,7 @@ Util.buildDetailView = function (data) {
 /* *******************************
  * Classification Validation Rules
  * *******************************/
-Util.classificationRules = () => {
+function classificationRules() {
   return [
     body("classification_name")
       .trim()
@@ -102,11 +102,11 @@ Util.classificationRules = () => {
 /* *******************************
  * Check classification data and return errors
  * *******************************/
-Util.checkClassificationData = async (req, res, next) => {
+async function checkClassificationData(req, res, next) {
   const {classification_name} = req.body
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
-    const nav = await Util.getNav()
+    const nav = await getNav()
     res.render("inventory/add-classification", {
       title: "Add Classification",
       nav,
@@ -122,7 +122,7 @@ Util.checkClassificationData = async (req, res, next) => {
 /* *******************************
  * Check classification data and return errors
  * *******************************/
-Util.inventoryRules = () => {
+function inventoryRules() {
   return [
     body("classification_id")
       .isInt({min: 1})
@@ -165,7 +165,7 @@ Util.inventoryRules = () => {
 
 /*handle errors and return sticky data*/
 
-Util.checkInventoryData = async (req, res, next) => {
+async function checkInventoryData(req, res, next) {
   const {
     classification_id, inv_make, inv_model, inv_year, inv_miles,
     inv_description, inv_color, inv_image, inv_thumbnail, inv_price
@@ -173,8 +173,11 @@ Util.checkInventoryData = async (req, res, next) => {
 
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
-    const nav = await Util.getNav()
-    const classificationList = await Util.buildClassificationList(classification_id)
+    const nav = await getNav()
+
+    const classificationList = await buildClassificationOptions(classification_id)
+
+
 
     res.render("inventory/add-inventory", {
       title: "Add Inventory",
@@ -191,14 +194,38 @@ Util.checkInventoryData = async (req, res, next) => {
   next()
 }
 
+/**
+ * Builds the <option> tags for the classification dropdown
+ */
+async function buildClassificationOptions(selectedId) {
+  const data = await invModel.getClassifications()
+  let options = '<option value="">Choose a Classification</option>'
+  data.rows.forEach(row => {
+    options += `<option value="${row.classification_id}"${row.classification_id == selectedId ? ' selected' : ''}>${row.classification_name}</option>`
+  })
+  return options
+}
+
 /* ****************************************
  * Middleware For Handling Errors
  * Wrap other function in this for 
  * General Error Handling
  **************************************** */
-Util.handleErrors = fn => (req, res, next) =>
-  Promise.resolve(fn(req, res, next)).catch(next);
+function handleErrors(fn) {
+  return (req, res, next) =>
+    Promise.resolve(fn(req, res, next)).catch(next)
+}
 
+const Util = {
+  getNav,
+  buildClassificationOptions,
+  buildDetailView,
+  classificationRules,
+  checkClassificationData,
+  inventoryRules,
+  checkInventoryData,
+  handleErrors
+}
 
 module.exports = Util
 

@@ -1,4 +1,4 @@
-<% include ../partials/header.ejs %>
+<%- include('../partials/header.ejs') %>
 
 <main>
     <h1>Add New Inventory Item</h1>
@@ -18,13 +18,16 @@
     <% } %>
 
     <form id="addInventoryForm" action="/inv/add-inventory" method="post">
-        <label for="classification_id">Classification</label>
+    <label for="classification_id">Classification</label>
+    <select id="classification_id" name="classification_id" required>
         <%- classificationList %>
+    </select>
 
-        <label for="inv_make">Make</label>
-        <input type="text" id="inv_make" required value="<%= typeof inv_make != 'undefined' ? inv_make : '' %>" />
 
-        <label for="inv_model">Model</label>
+    <label for="inv_make">Make</label>
+    <input type="text" id="inv_make" name="inv_make" required value="<%= typeof inv_make != 'undefined' ? inv_make : '' %>" />
+
+    <label for="inv_model">Model</label>
     <input type="text" id="inv_model" name="inv_model" required value="<%= typeof inv_model != 'undefined' ? inv_model : '' %>" />
 
     <label for="inv_year">Year</label>
@@ -53,4 +56,4 @@
 
 </main>
 
-<% include ../partials/footer.ejs %>
+<%- include('../partials/footer.ejs') %>

@@ -29,7 +29,7 @@ router.post(
     "/add-inventory",
     utilities.inventoryRules(),
     utilities.checkInventoryData,
-    utilities.handleErrors(invController.buildAddInventory)
+    utilities.handleErrors(invController.AddInventory)
 )
 
 module.exports = router;

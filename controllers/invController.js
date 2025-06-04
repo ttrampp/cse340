@@ -25,13 +25,13 @@ invController.buildByClassificationId = async function (req, res, next) {
 
 invController.buildByInventoryId = async function (req, res, next) {
   const invId = req.params.invId;
-  console.log("✅ Route hit: /inventory/detail/" + invId);
+  console.log("Route hit: /inventory/detail/" + invId);
   try {
     const data = await invModel.getInventoryById(invId);
-    console.log("✅ Data returned from DB:", data);
+    console.log("Data returned from DB:", data);
 
     if (!data) {
-      console.log("❌ No data found for inv_id:", invId);
+      console.log("No data found for inv_id:", invId);
       return res.status(404).render("error", {
         title: "Vehicle Not Found",
         message: "We couldn’t find a vehicle with that ID.",
@@ -49,7 +49,7 @@ invController.buildByInventoryId = async function (req, res, next) {
     });
 
   } catch (error) {
-    console.error("❌ ERROR in buildByInventoryId:", error);
+    console.error("ERROR in buildByInventoryId:", error);
     next(error);
   }
 };
@@ -131,7 +131,7 @@ invController.addClassification = async function (req, res, next) {
 invController.buildAddInventory = async function (req, res, next) {
   try {
     const nav = await utilities.getNav()
-    const classificationList = await utilities.buildClassificationList()
+    const classificationList = await utilities.buildClassificationOptions("")
     res.render("inventory/add-inventory", {
       title: "Add Inventory",
       nav,
@@ -174,7 +174,7 @@ invController.addInventory = async function (req, res, next) {
       })
     } else {
       const nav = await utilities.getNav()
-      const classificationList = await utilities.buildClassificationList(classification_id)
+      const classificationList = await utilities.buildClassificationOptions(classification_id)
       req.flash("notice", "Inventory item failed to add.")
       res.status(501).render("inventory/add-inventory", {
         title: "Add Inventory",
