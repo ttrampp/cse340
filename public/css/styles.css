@@ -394,7 +394,43 @@ form input[type="submit"] {
 
 form button:hover,
 form input[type="submit"]:hover {
-  background-color: #005fa3;
+  background-color: #b2d8f3;
+}
+
+/* Inventory Management Table Styling */
+#inventoryDisplay {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+}
+
+#inventoryDisplay th,
+#inventoryDisplay td {
+  border: 1px solid #ccc;
+  padding: 0.5em;
+  text-align: left;
+}
+
+#inventoryDisplay th {
+  background-color: #f2f2f2;
+}
+
+#inventoryDisplay tr:nth-child(even) {
+  background-color: #b0c9e3;
+}
+
+#inventoryDisplay a {
+  text-decoration: none;
+  color: #005fa3;
+  display: inline-block;
+  border-bottom: 2px solid transparent;
+}
+
+#inventoryDisplay a:hover {
+  text-decoration: underline;
+  font-size: large;
+  font-weight: bold;
+  border-bottom: 2px solid #0645AD;
 }
 
 footer {
