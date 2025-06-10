@@ -394,7 +394,22 @@ form input[type="submit"] {
 
 form button:hover,
 form input[type="submit"]:hover {
-  background-color: #b2d8f3;
+  background-color: rgb(98, 238, 114);
+
+  color: black;
+}
+
+button:disabled {
+  background-color: #ccc;
+  color: #668;
+  cursor: not-allowed;
+  border: 1px solid #999;
+  box-shadow: none;
+  transition: none;
+}
+
+button:disabled:hover {
+  background-color: #ccc;
 }
 
 /* Inventory Management Table Styling */
@@ -421,16 +436,14 @@ form input[type="submit"]:hover {
 
 #inventoryDisplay a {
   text-decoration: none;
-  color: #005fa3;
+  color: black;
   display: inline-block;
   border-bottom: 2px solid transparent;
 }
 
 #inventoryDisplay a:hover {
-  text-decoration: underline;
-  font-size: large;
-  font-weight: bold;
-  border-bottom: 2px solid #0645AD;
+  border-bottom: 2px solid orange;
+  color: orangered;
 }
 
 footer {

@@ -223,6 +223,37 @@ async function checkInventoryData(req, res, next) {
   next()
 }
 
+/*handle errors and return sticky data to edit view*/
+
+async function checkUpdateData(req, res, next) {
+  const {
+    classification_id, inv_make, inv_model, inv_year, inv_miles,
+    inv_description, inv_color, inv_image, inv_thumbnail, inv_price, inv_id
+  } = req.body
+
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    const nav = await getNav()
+
+    const classificationList = await buildClassificationOptions(classification_id)
+
+
+
+    res.render("inventory/edit-inventory", {
+      title: "Edit " + inv_make + " " + inv_model,
+      nav,
+      classificationList,
+      errors: errors.array(),
+      message: null,
+      classification_id, inv_make, inv_model, inv_year,
+      inv_description, inv_image, inv_thumbnail, inv_price,
+      inv_miles, inv_color, inv_id
+    })
+    return
+  }
+  next()
+}
+
 /**
  * Builds the <option> tags for the classification dropdown
  */
