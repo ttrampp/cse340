@@ -194,7 +194,16 @@ async function updateAccountInfo(req, res) {
     })
   } else {
     req.flash("notice", "Update failed. Try again.")
-    res.redirect(`/account/update/${account_id}`)
+    res.status(400).render("account/update-account", {
+      title: "Edit Account",
+      nav,
+      errors: null,
+      message: req.flash("notice"),
+      account_firstname,
+      account_lastname,
+      account_email,
+      account_id
+  })
   }
 }
 

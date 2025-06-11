@@ -137,6 +137,28 @@ validate.passwordRules = () => {
   ]
 }
 
+//Checks validation errors and render the form again
+validate.checkUpdatePassword = async (req, res, next) => {
+  const { account_id } = req.body
+  let nav = await utilities.getNav()
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.status(400).render("account/update-account", {
+      title: "Edit Account",
+      nav,
+      errors: errors.array(),
+      message: req.flash("notice"),
+      account_firstname: req.body.account_firstname,
+      account_lastname: req.body.account_lastname,
+      account_email: req.body.account_email,
+      account_id: account_id
+    })
+  }
+  next()
+}
+
+
 
 /* ******************************
  * Check login data and return errors or continue
@@ -180,18 +202,19 @@ validate.checkUpdateData = async (req, res, next) => {
 }
 
 // Check password update data
-validate.checkPasswordData = async (req, res, next) => {
+validate.checkUpdatePassword = async (req, res, next) => {
   const { account_password, account_id } = req.body
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
+    const account = await accountModel.getAccountById(account_id)
     let nav = await utilities.getNav()
     res.render("account/update-account", {
       title: "Edit Account",
       nav,
       errors: errors.array(),
-      account_firstname: "", // Blank these out for password-only form
-      account_lastname: "",
-      account_email: "",
+      account_firstname: account.account_firstname,
+      account_lastname: account.account_lastname,
+      account_email: account.account_email,
       account_id,
       message: null,
     })

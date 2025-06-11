@@ -39,7 +39,7 @@ router.post(
 router.post(
   "/update-password",
   regValidate.passwordRules(),              // reuse strong password check
-  regValidate.checkPasswordData,            // will define this next
+  regValidate.checkUpdatePassword,            // will define this next
   utilities.handleErrors(accountController.updateAccountPassword)
 )
 
