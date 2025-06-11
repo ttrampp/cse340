@@ -2,23 +2,45 @@
  * This server.js file is the primary file of the 
  * application. It is used to control the project.
  *******************************************/
-/* ***********************
+/***********************
  * Require Statements
- *************************/
-const express = require("express")
-const expressLayouts = require("express-ejs-layouts")
-const env = require("dotenv").config()
-const app = express()
-app.use(express.static("public"));
-const static = require("./routes/static")
-const baseController = require("./controllers/baseController")
-const inventoryRoute = require("./routes/inventoryRoute");
-const utilities = require("./utilities")
+ ************************/
+
+// Load environment variables
+require("dotenv").config();
+
+const express = require("express");
+const app = express();
+
+// Middleware and libraries
+const expressLayouts = require("express-ejs-layouts");
 const session = require("express-session");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+
+// Utilities and database
+const utilities = require("./utilities");
 const pool = require("./database");
+
+// Routes
+const static = require("./routes/static");
+const baseController = require("./controllers/baseController");
+const inventoryRoute = require("./routes/inventoryRoute");
 const accountRoute = require("./routes/accountRoute");
-const bodyParser = require("body-parser")
-const cookieParser = require("cookie-parser")
+
+
+//static files
+app.use(static)
+
+/* ***********************
+ * Body Parser Middleware
+ *************************/
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
+//Cookies and sessions
+app.use(cookieParser())
+app.use(utilities.checkJWTToken)
 
 /* ***********************
  * Session and Messages Middleware
@@ -43,14 +65,11 @@ app.use(function (req, res, next) {
 });
 
 
-
-/* ***********************
- * Body Parser Middleware
- *************************/
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
-app.use(cookieParser())
-app.use(utilities.checkJWTToken)
+//Make session account data available in views
+app.use((req, res, next) => {
+  res.locals.accountData = req.session?.accountData || null;
+  next();
+});
 
 /* ***********************
  * View Engine and Templates
@@ -62,7 +81,7 @@ app.set("layout", "./layouts/layout") //not at views root
 /* ***********************
  * Routes
  *************************/
-app.use(static)
+
 //Index route
 app.get("/", utilities.handleErrors(baseController.buildHome))
 

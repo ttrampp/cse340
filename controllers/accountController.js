@@ -105,9 +105,11 @@ async function accountLogin(req, res) {
     const match = await bcrypt.compare(account_password, accountData.account_password)
     console.log("Password match:", match)
     if (match) {
-
       delete accountData.account_password
-      const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
+      //save to session
+      req.session.accountData = accountData
+      //create JWT token
+      const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
       if(process.env.NODE_ENV === 'development') {
         res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 3600 * 1000 })
       } else {
@@ -141,8 +143,113 @@ async function buildAccountManagement(req, res) {
     title: "Account Management",
     nav, 
     errors: null,
-    message: req.flash("notice")
+    message: req.flash("notice"),
+    accountData: res.locals.accountData
   })
 }
 
-module.exports = {buildLogin, buildRegister, registerAccount, accountLogin, buildAccountManagement};
+/* ****************************************
+ *  Deliver account update view
+ * ************************************ */
+async function buildUpdateAccountView(req, res) {
+  const account_id = req.params.accountId
+  const account = await accountModel.getAccountById(account_id)
+  let nav = await utilities.getNav()
+
+  res.render("account/update-account", {
+    title: "Edit Account",
+    nav,
+    errors: null,
+    message: req.flash("notice"),
+    account_firstname: account.account_firstname,
+    account_lastname: account.account_lastname,
+    account_email: account.account_email,
+    account_id: account.account_id
+  })
+}
+
+/* ****************************************
+ *  Process account info update
+ * ************************************ */
+async function updateAccountInfo(req, res) {
+  const { account_id, account_firstname, account_lastname, account_email } = req.body
+  let nav = await utilities.getNav()
+
+  const updateResult = await accountModel.updateAccount(
+    account_id,
+    account_firstname,
+    account_lastname,
+    account_email
+  )
+
+  if (updateResult) {
+    req.flash("notice", "Account information updated successfully.")
+    const accountData = await accountModel.getAccountById(account_id)
+    res.render("account/account-management", {
+      title: "Account Management",
+      nav,
+      errors: null,
+      message: req.flash("notice"),
+      accountData
+    })
+  } else {
+    req.flash("notice", "Update failed. Try again.")
+    res.redirect(`/account/update/${account_id}`)
+  }
+}
+
+/* ****************************************
+ *  Process password change
+ * ************************************ */
+async function updateAccountPassword(req, res) {
+  const { account_id, account_password } = req.body
+  let nav = await utilities.getNav()
+
+  try {
+    const hashedPassword = await bcrypt.hash(account_password, 10)
+    const updateResult = await accountModel.updatePassword(account_id, hashedPassword)
+
+    if (updateResult) {
+      req.flash("notice", "Password updated successfully.")
+    } else {
+      req.flash("notice", "Password update failed.")
+    }
+
+    const accountData = await accountModel.getAccountById(account_id)
+    res.render("account/account-management", {
+      title: "Account Management",
+      nav,
+      errors: null,
+      message: req.flash("notice"),
+      accountData
+    })
+  } catch (error) {
+    console.error("Password update error:", error)
+    req.flash("notice", "Error updating password.")
+    res.redirect(`/account/update/${account_id}`)
+  }
+}
+
+/* ****************************************
+ *  Process logout and clear cookie
+ * ************************************ */
+function logout(req, res) {
+  res.clearCookie("jwt")
+  req.session.accountData = null
+  res.locals.accountData = null
+  res.locals.loggedin = 0
+  req.flash("notice", "You have successfully logged out.")
+  res.redirect("/")
+}
+
+module.exports = {
+  buildLogin, 
+  buildRegister, 
+  registerAccount, 
+  accountLogin, 
+  buildAccountManagement, 
+  buildUpdateAccountView, 
+  updateAccountInfo, 
+  updateAccountPassword, 
+  logout
+};

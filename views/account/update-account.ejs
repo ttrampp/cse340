@@ -1,0 +1,46 @@
+
+<h1><%= title %></h1>
+
+<% if (message.length > 0) { %>
+  <div class="notice"><%= message %></div>
+<% } %>
+
+<% if (errors && errors.length > 0) { %>
+  <ul class="notice">
+    <% errors.forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<!-- ACCOUNT INFO UPDATE FORM -->
+<h2>Update Account Information</h2>
+<form action="/account/update" method="post">
+  <label for="account_firstname">First Name:</label>
+  <input type="text" id="account_firstname" name="account_firstname" required value="<%= account_firstname %>">
+
+  <label for="account_lastname">Last Name:</label>
+  <input type="text" id="account_lastname" name="account_lastname" required value="<%= account_lastname %>">
+
+  <label for="account_email">Email:</label>
+  <input type="email" id="account_email" name="account_email" required value="<%= account_email %>">
+
+  <input type="hidden" name="account_id" value="<%= account_id %>">
+  <input type="submit" value="Update Account Info">
+</form>
+
+<!-- PASSWORD CHANGE FORM -->
+<h2>Change Password</h2>
+<form action="/account/update-password" method="post">
+  <label for="account_password">New Password:</label>
+  <input type="password" id="account_password" name="account_password" required>
+
+  <p class="password-requirements">
+    Password must be at least 12 characters and include upper/lowercase letters, a number, and a special character.
+  </p>
+
+  <input type="hidden" name="account_id" value="<%= account_id %>">
+  <input type="submit" value="Change Password">
+</form>
+
+

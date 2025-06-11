@@ -94,6 +94,50 @@ validate.loginRules = () => {
   ]
 }
 
+// Account Update Rules
+validate.updateAccountRules = () => {
+  return [
+    body("account_firstname")
+      .trim()
+      .notEmpty()
+      .withMessage("First name is required."),
+    body("account_lastname")
+      .trim()
+      .notEmpty()
+      .withMessage("Last name is required."),
+    body("account_email")
+      .trim()
+      .isEmail()
+      .normalizeEmail()
+      .withMessage("A valid email is required.")
+      .custom(async (account_email, { req }) => {
+        const account_id = req.body.account_id
+        const existingAccount = await accountModel.getAccountByEmail(account_email)
+        if (existingAccount && existingAccount.account_id != account_id) {
+          throw new Error("Email exists. Use a different one.")
+        }
+      }),
+  ]
+}
+
+// Password Rules (reuse registration logic)
+validate.passwordRules = () => {
+  return [
+    body("account_password")
+      .trim()
+      .notEmpty()
+      .isStrongPassword({
+        minLength: 12,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+      })
+      .withMessage("Password does not meet requirements."),
+  ]
+}
+
+
 /* ******************************
  * Check login data and return errors or continue
  * ***************************** */
@@ -114,5 +158,46 @@ validate.checkLoginData = async (req, res, next) => {
   next()
 }
 
+// Check update account info data
+validate.checkUpdateData = async (req, res, next) => {
+  const { account_firstname, account_lastname, account_email, account_id } = req.body
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    let nav = await utilities.getNav()
+    res.render("account/update-account", {
+      title: "Edit Account",
+      nav,
+      errors: errors.array(),
+      account_firstname,
+      account_lastname,
+      account_email,
+      account_id,
+      message: null,
+    })
+    return
+  }
+  next()
+}
+
+// Check password update data
+validate.checkPasswordData = async (req, res, next) => {
+  const { account_password, account_id } = req.body
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    let nav = await utilities.getNav()
+    res.render("account/update-account", {
+      title: "Edit Account",
+      nav,
+      errors: errors.array(),
+      account_firstname: "", // Blank these out for password-only form
+      account_lastname: "",
+      account_email: "",
+      account_id,
+      message: null,
+    })
+    return
+  }
+  next()
+}
 
 module.exports = validate;

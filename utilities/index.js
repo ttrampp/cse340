@@ -3,7 +3,7 @@ const invModel = require("../models/inventory-model")
 const {body, validationResult} = require("express-validator")
 
 const jwt = require("jsonwebtoken")
-require("dotenv").config
+require("dotenv").config()
 
 /* ************************
  * Constructs the nav HTML unordered list
@@ -267,31 +267,9 @@ async function buildClassificationOptions(selectedId) {
 }
 
 /* ****************************************
- * Middleware For Handling Errors
- * Wrap other function in this for 
- * General Error Handling
- **************************************** */
-function handleErrors(fn) {
-  return (req, res, next) =>
-    Promise.resolve(fn(req, res, next)).catch(next)
-}
-
-const Util = {
-  getNav,
-  buildClassificationOptions,
-  buildClassificationGrid,
-  buildDetailView,
-  classificationRules,
-  checkClassificationData,
-  inventoryRules,
-  checkInventoryData,
-  handleErrors
-}
-
-/* ****************************************
 * Middleware to check token validity
 **************************************** */
-Util.checkJWTToken = (req, res, next) => {
+const checkJWTToken = (req, res, next) => {
  if (req.cookies.jwt) {
   jwt.verify(
    req.cookies.jwt,
@@ -312,16 +290,55 @@ Util.checkJWTToken = (req, res, next) => {
 }
 
 /* ****************************************
- *  Check Login
- * ************************************ */
- Util.checkLogin = (req, res, next) => {
-  if (res.locals.loggedin) {
+*  Check Login
+* ************************************ */
+const checkLogin = (req, res, next) => {
+if (res.locals.loggedin) {
+  next()
+} else {
+  req.flash("notice", "Please log in.")
+  return res.redirect("/account/login")
+}
+}
+
+// Restrict access to employees and admins
+const checkAccountType = (req, res, next) => {
+  const accountType = res.locals.accountData?.account_type
+  if (accountType === "Employee" || accountType === "Admin") {
     next()
   } else {
-    req.flash("notice", "Please log in.")
+    req.flash("notice", "Access denied. You must be an employee or admin.")
     return res.redirect("/account/login")
   }
- }
+}
+
+/* ****************************************
+ * Middleware For Handling Errors
+ * Wrap other function in this for 
+ * General Error Handling
+ **************************************** */
+function handleErrors(fn) {
+  return (req, res, next) =>
+    Promise.resolve(fn(req, res, next)).catch(next)
+}
+
+const Util = {
+  getNav,
+  buildClassificationOptions,
+  buildClassificationGrid,
+  buildDetailView,
+  classificationRules,
+  checkClassificationData,
+  inventoryRules,
+  checkInventoryData,
+  checkUpdateData,
+  handleErrors,
+  checkJWTToken,
+  checkLogin,
+  checkAccountType  
+}
+
+
 
 module.exports = Util
 
