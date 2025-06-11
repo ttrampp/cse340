@@ -45,4 +45,22 @@ router.post(
     utilities.handleErrors(invController.updateInventory)
 )
 
+//Deliver the delete confirmation view
+router.get('/delete/:inv_id', async (req, res, next) => {
+    try {
+        return invController.buildDeleteView(req, res, next);
+    } catch (err) {
+        next(err);
+    }
+});
+
+//Handle the delete submission
+router.post('/delete/', async (req, res, next) => {
+    try {
+        return invController.deleteInventoryItem(req, res, next);
+    } catch (err) {
+        next(err);
+    }
+});
+
 module.exports = router;

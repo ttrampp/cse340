@@ -238,6 +238,67 @@ invController.buildEditInventoryView = async function (req, res, next) {
 }
 
 /* ***************************
+ * Deliver the delete inventory confirmation view
+ * ************************** */
+invController.buildDeleteView = async function (req, res, next) {
+  const inv_id = req.params.inv_id;
+  try {
+    const data = await invModel.getInventoryById(inv_id);
+    const nav = await utilities.getNav();
+    const name = `${data.inv_make} ${data.inv_model}`;
+    res.render("inventory/delete-confirm", {
+      title: `Delete ${name}`,
+      nav,
+      message: req.flash("notice"),
+      errors: null,
+      inv_id: data.inv_id,
+      inv_make: data.inv_make,
+      inv_model: data.inv_model,
+      inv_year: data.inv_year,
+      inv_price: data.inv_price
+    });
+  } catch (error) {
+    console.error("Error building delete view:", error);
+    next(error);
+  }
+}
+
+/* ***************************
+ *  Delete Inventory Item
+ * ************************** */
+invController.deleteInventoryItem = async function (req, res, next) {
+  const inv_id = parseInt(req.body.inv_id, 10)
+
+  try {
+    const deleteResult = await invModel.deleteInventoryItem(inv_id)
+
+    if (deleteResult) {
+      const nav = await utilities.getNav()
+      req.flash("notice", "The inventory item was successfully deleted.")
+      res.redirect("/inv/")
+    } else {
+      const nav = await utilities.getNav()
+      req.flash("notice", "Sorry, the delete failed.")
+      res.status(501).render("inventory/delete-confirm", {
+        title: "Delete Inventory Item",
+        nav,
+        message: req.flash("notice"),
+        errors: null,
+        inv_id: req.body.inv_id,
+        inv_make: req.body.inv_make,
+        inv_model: req.body.inv_model,
+        inv_year: req.body.inv_year,
+        inv_price: req.body.inv_price
+      })
+    }
+  } catch (error) {
+    console.error("Error deleting inventory item:", error)
+    next(error)
+  }
+}
+
+
+/* ***************************
  *  Update Inventory Data
  * ************************** */
 invController.updateInventory = async function (req, res, next) {
@@ -293,6 +354,5 @@ invController.updateInventory = async function (req, res, next) {
     next(error)
   }
 }
-
 
 module.exports = invController
