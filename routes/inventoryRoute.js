@@ -3,7 +3,7 @@ const express = require("express")
 const router = new express.Router() 
 const invController = require("../controllers/invController")
 const utilities = require("../utilities");
-const inventoryValidate = require("../utilities/")
+const {showAuditLogs} = require("../controllers/invController")
 
 // Route to build inventory by classification view
 router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId));
@@ -63,8 +63,8 @@ router.post(
     "/update/",
     utilities.checkLogin,
     utilities.checkAccountType,
-    inventoryValidate.inventoryRules(),
-    inventoryValidate.checkInventoryData,
+    utilities.inventoryRules(),
+    utilities.checkInventoryData,
     utilities.handleErrors(invController.updateInventory)
 )
 
@@ -83,5 +83,18 @@ router.post(
     utilities.handleErrors(invController.deleteInventoryItem)
 );
 
+router.get(
+    "/log",
+    utilities.checkAdminOnly,
+    utilities.handleErrors(invController.buildInventoryLogView)
+)
+
+router.get(
+    "/audit-log",
+    utilities.checkAdminOnly,
+    utilities.handleErrors(showAuditLogs)
+)
+
+router.post("/log/clear", invController.clearAuditLog)
 
 module.exports = router;

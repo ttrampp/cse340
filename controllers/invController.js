@@ -1,6 +1,7 @@
 const invModel = require("../models/inventory-model")
 const utilities = require("../utilities/")
 const invController = {}
+const {getInventoryLogs, logInventoryChange} = require("../models/audit-model")
 
 /* ***************************
  *  Build inventory by classification view
@@ -149,8 +150,16 @@ invController.buildAddInventory = async function (req, res, next) {
 
 invController.addInventory = async function (req, res, next) {
   const {
-    classification_id, inv_make, inv_model, inv_year, inv_miles, 
-    inv_color, inv_description, inv_image, inv_thumbnail, inv_price
+    classification_id,
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    inv_color
   } = req.body
 
   try {
@@ -167,7 +176,30 @@ invController.addInventory = async function (req, res, next) {
       inv_color
     )
 
-    if (addResult) {
+    if (addResult && addResult.rows.length > 0) {
+      const newVehicleId = addResult.rows[0].inv_id
+      const newVehicleData = {
+        classification_id,
+        inv_make,
+        inv_model,
+        inv_year,
+        inv_description,
+        inv_image,
+        inv_thumbnail,
+        inv_price,
+        inv_miles,
+        inv_color
+      }
+
+      // Log the ADD action to the inventory_audit table
+      await logInventoryChange(
+        newVehicleId,
+        "ADD",
+        null,
+        JSON.stringify(newVehicleData),
+        req.session.accountData.account_id
+      )
+
       const nav = await utilities.getNav()
       req.flash("notice", "Inventory item successfully added.")
       res.status(201).render("inventory/management", {
@@ -185,9 +217,16 @@ invController.addInventory = async function (req, res, next) {
         classificationList,
         message: req.flash("notice"),
         error: null,
-        classification_id, inv_make, inv_model, inv_year,
-        inv_description, inv_image, inv_thumbnail, inv_price,
-        inv_miles, inv_color
+        classification_id,
+        inv_make,
+        inv_model,
+        inv_year,
+        inv_description,
+        inv_image,
+        inv_thumbnail,
+        inv_price,
+        inv_miles,
+        inv_color
       })
     }
   } catch (error) {
@@ -270,9 +309,20 @@ invController.deleteInventoryItem = async function (req, res, next) {
   const inv_id = parseInt(req.body.inv_id, 10)
 
   try {
+    //Get deleted item data before deleting--for audit log
+    const deletedData = await invModel.getInventoryById(inv_id)
     const deleteResult = await invModel.deleteInventoryItem(inv_id)
 
     if (deleteResult) {
+      // Log DELETE to audit table
+      await logInventoryChange(
+        inv_id,
+        "DELETE",
+        JSON.stringify(deletedData),
+        null,
+        req.session.accountData.account_id
+      );
+
       const nav = await utilities.getNav()
       req.flash("notice", "The inventory item was successfully deleted.")
       res.redirect("/inv/")
@@ -315,6 +365,9 @@ invController.updateInventory = async function (req, res, next) {
   const inv_color = req.body.inv_color
 
   try {
+    // Get original inventory data BEFORE the update (for logging)
+    const originalData = await invModel.getInventoryById(inv_id);
+
     const updateResult = await invModel.updateInventory(
       inv_make,
       inv_model,
@@ -330,8 +383,31 @@ invController.updateInventory = async function (req, res, next) {
     )
 
     if (updateResult) {
+      const newData = {
+        inv_id,
+        inv_make,
+        inv_model,
+        inv_description,
+        inv_image,
+        inv_thumbnail,
+        inv_price,
+        inv_year,
+        inv_miles,
+        inv_color,
+        classification_id,
+        classification_name: originalData.classification_name
+      }
+
+      // Log UPDATE to audit log
+      await logInventoryChange(
+        inv_id,
+        "UPDATE",
+        JSON.stringify(originalData),
+        JSON.stringify(newData),
+        req.session.accountData.account_id
+      );
       const nav = await utilities.getNav()
-      const itemName = updateResult.inv_make + " " + updateResult.inv_model
+      const itemName = inv_make + " " + inv_model;
       req.flash("notice", `The ${itemName} was successfully updated.`)
       res.redirect("/inv/")
     } else {
@@ -345,14 +421,91 @@ invController.updateInventory = async function (req, res, next) {
         classificationList: classificationList,
         message: req.flash("notice"),
         error: null,
-        inv_id, classification_id, inv_make, inv_model, inv_year,
-        inv_description, inv_image, inv_thumbnail, inv_price,
-        inv_miles, inv_color
+        inv_make,
+        inv_model,
+        inv_description,
+        inv_image,
+        inv_thumbnail,
+        inv_price,
+        inv_year,
+        inv_miles,
+        inv_color,
+        classification_id,
+        inv_id
       })
     }
   } catch (error) {
     next(error)
   }
 }
+
+/* ***************************
+ *  Build Inventory Change Log View (Admin only)
+ * ************************** */
+invController.buildInventoryLogView = async function (req, res) {
+  try {
+    const logs = await require("../models/audit-model").getInventoryLogs()
+    const nav = await utilities.getNav()
+
+    console.log("Sending logs to inventory log view:", logs)
+
+    console.log("Logs going to inventory-log.ejs:");
+    logs.forEach((log, i) => {
+      console.log(`Log #${i + 1}:`, log);
+    });
+
+    res.render("inventory/inventory-log", {
+      title: "Inventory Change Log",
+      nav,
+      logs,
+      accountData: req.session.accountData,
+      message: req.flash("notice")
+    })
+  } catch (err) {
+    console.error("Failed to load audit log:", err)
+    const nav = await utilities.getNav()
+    res.status(500).render("inventory/inventory-log", {
+      title: "Inventory Change Log",
+      nav,
+      logs: [],
+      accountData: req.session.accountData,
+      message: "Error loading log."
+    })
+  }
+}
+
+/* ***************************
+ *  Display Inventory Audit Logs (Admin only)
+ * ************************** */
+invController.showAuditLogs = async function (req, res, next) {
+  try {
+    const logs = await getInventoryLogs()
+    const nav = await utilities.getNav()
+    res.render("inventory/audit-log", {
+      title: "Inventory Audit Log",
+      nav,
+      logs
+    })
+  } catch (error) {
+    console.error("Error loading audit logs:", error)
+    next(error)
+  }
+}
+
+/* ***************************
+ *  Clear Audit Logs
+ * ************************** */
+invController.clearAuditLog = async function (req, res, next) {
+  try {
+    await require("../models/audit-model").clearInventoryLogs()
+    req.flash("notice", "Audit log cleared.")
+    res.redirect("/inv/log")
+  } catch (error) {
+    console.error("Error clearing audit log:", error)
+    next(error)
+  }
+}
+
+
 
 module.exports = invController

@@ -1,0 +1,80 @@
+<h1><%= title %></h1>
+
+<form action="/inv/log/clear" method="POST" class="clear-audit-form" onsubmit="return confirm('⚠️CAUTION!⚠️\n\n This is a PERMANENT action. This cannot be recovered.\nAre you sure you want to clear the entire audit log?');">
+  <button type="submit" class="clear-audit-button">🗑️Clear Audit Log</button>
+</form>
+
+<% if (logs && logs.length > 0) { %>
+  <table class="log-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Action</th>
+        <th>Vehicle</th>
+        <th>Changed By</th>
+        <th>Before Data</th>
+        <th>After Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% 
+        const fieldOrder = [
+          "inv_id", "inv_make", "inv_model", "inv_year", "inv_description",
+          "inv_image", "inv_thumbnail", "inv_price", "inv_miles",
+          "inv_color", "classification_id", "classification_name"
+        ];
+        logs.forEach(log => {
+          const beforeObj = JSON.parse(log.old_data || '{}');
+          const afterObj = JSON.parse(log.new_data || '{}');
+      %>
+        <tr>
+          <td>
+            <%= new Date(log.change_date).toLocaleDateString() %><br>
+            <%= new Date(log.change_date).toLocaleTimeString() %>
+          </td>
+          <td><%= log.action || "N/A" %></td>
+          <td title="<%- log.vehicle_name ? log.vehicle_name.replace(/"/g, '&quot;') : 'N/A' %>">
+            <%= log.vehicle_name || "N/A" %>
+          </td>
+          <td><%= log.changed_by_name || "N/A" %></td>
+
+          <td>
+            <div class="audit-section">
+              <ul>
+                <% fieldOrder.forEach(key => {
+                     const beforeVal = beforeObj[key];
+                     const afterVal = afterObj[key];
+                     const isChanged = beforeVal != afterVal;
+                %>
+                  <li>
+                    <strong class="audit-key"><%= key %>: </strong>&nbsp;
+                    <span class="audit-value"><%- isChanged ? `<span class="changed-field">${beforeVal}</span>` : beforeVal %></span>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+          </td>
+
+          <td>
+            <div class="audit-section">
+              <ul>
+                <% fieldOrder.forEach(key => {
+                     const beforeVal = beforeObj[key];
+                     const afterVal = afterObj[key];
+                     const isChanged = beforeVal != afterVal;
+                %>
+                  <li>
+                    <strong class="audit-key"><%= key %>: </strong>&nbsp;
+                    <span class="audit-value"><%- isChanged ? `<span class="changed-field">${afterVal}</span>` : afterVal %></span>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } else { %>
+  <p>The audit log is empty. Nothing to report!</p>
+<% } %>

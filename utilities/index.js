@@ -312,6 +312,17 @@ const checkAccountType = (req, res, next) => {
   }
 }
 
+// Restrict access to admins only
+const checkAdminOnly = (req, res, next) => {
+  const accountType = res.locals.accountData?.account_type
+  if (accountType === "Admin") {
+    next()
+  } else {
+    req.flash("notice", "Access denied. Admins only.")
+    return res.redirect("/account/")
+  }
+}
+
 /* ****************************************
  * Middleware For Handling Errors
  * Wrap other function in this for 
@@ -335,7 +346,8 @@ const Util = {
   handleErrors,
   checkJWTToken,
   checkLogin,
-  checkAccountType  
+  checkAccountType,
+  checkAdminOnly  
 }
 
 

@@ -61,30 +61,47 @@ async function addClassification(classification_name) {
  * Add new inventory item to the database
  * ************************** */
 async function addInventory(
-  classification_id, inv_make, inv_model, inv_year,
-  inv_description, inv_image, inv_thumbnail, inv_price,
-  inv_miles, inv_color
+  inv_make,
+  inv_model,
+  inv_description,
+  inv_image,
+  inv_thumbnail,
+  inv_price,
+  inv_year,
+  inv_miles,
+  inv_color,
+  classification_id,
+  inv_id
 ) {
   try {
     const sql = `
       INSERT INTO inventory (
-        classification_id, inv_make, inv_model, inv_year,
-        inv_description, inv_image, inv_thumbnail, inv_price,
-        inv_miles, inv_color
+        inv_make,
+        inv_model,
+        inv_description,
+        inv_image,
+        inv_thumbnail,
+        inv_price,
+        inv_year,
+        inv_miles,
+        inv_color,
+        classification_id,
+        inv_id
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     `
     const data = await pool.query(sql, [
-      classification_id,
       inv_make,
       inv_model,
-      inv_year,
       inv_description,
       inv_image,
       inv_thumbnail,
       inv_price,
+      inv_year,
       inv_miles,
-      inv_color
+      inv_color,
+      classification_id,
+      inv_id
     ])
     return data.rowCount
   } catch (error) {

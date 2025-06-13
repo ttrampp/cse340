@@ -19,3 +19,8 @@
   <h3>Inventory Management</h3>
   <p><a href="/inv/">Access the Inventory Management System</a></p>
 <% } %>
+
+<!-- Show Inventory Change Log link only to Admin -->
+<% if (accountData.account_type === "Admin") { %>
+  <p><a href="/inv/log">View Inventory Change Log</a></p>
+<% } %>

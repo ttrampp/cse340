@@ -311,6 +311,7 @@ ul.notice {
   color: #003b5c;
   border-radius: 5px;
   margin-bottom: 1rem;
+  font-style: italic;
 }
 
 /*INVALID AND VALID INPUTS*/
@@ -453,6 +454,126 @@ button:disabled:hover {
   border-bottom: 2px solid orange;
   color: orangered;
 }
+
+ .log-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.log-table th,
+.log-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.log-table th {
+  background-color: #f2f2f2;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 300px;
+}
+
+.account-link {
+  font-size: 1rem;
+  color: #004080;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.changed-field {
+  color: red;
+  font-weight: bold;
+}
+
+.audit-section ul {
+  margin: 0;
+  list-style-type: none;
+  padding-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.audit-section strong {
+  display: inline-block;
+  width: 140px;
+  margin-bottom: 0.25rem;
+}
+
+.audit-section {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+} 
+
+
+.audit-section li {
+  display: flex;
+  align-items: flex-start;
+  padding-bottom: 4px;
+}
+
+.audit-key {
+  min-width: 140px;      
+  display: inline-block;
+  font-weight: bold;
+}
+
+.audit-value {
+  padding-left: 8px; 
+  word-break: break-word;
+  max-width: 300px;   
+}
+
+.log-table th:nth-child(3), /* Vehicle */
+.log-table td:nth-child(3) {
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-table th:nth-child(1), /* Date */
+.log-table td:nth-child(1) {
+  width: 100px;
+}
+
+.log-table th:nth-child(4), /* Changed By */
+.log-table td:nth-child(4) {
+  white-space: nowrap;
+}
+
+.clear-audit-form {
+  margin: 0;
+  padding: 0;
+  text-align: left; 
+  margin-bottom: 38px;
+  width: auto;
+  max-width: fit-content;
+}
+
+.clear-audit-button {
+  background-color: #613413;
+  color: white;
+  border: 1px solid #f5c6cb;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clear-audit-button:hover {
+  background-color: yellow;
+  color: black;
+}
+
 
 footer {
   text-align: left;
